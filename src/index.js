@@ -56,6 +56,7 @@ const tabpanelInterpolationR = {
 class PaperOnboardingContainer extends Component {
   static propTypes = {
     screens: PropTypes.array,
+    onIndexChanged: PropTypes.func,
   }
 
   constructor(props) {
@@ -149,6 +150,10 @@ class PaperOnboardingContainer extends Component {
         rootBackground: screens[nextIndex].backgroundColor,
         nextPoint: { x: 0, y: 0 },
       });
+
+      if (typeof this.props.onIndexChanged === 'function') {
+        this.props.onIndexChanged(this.state.currentScreen)
+      };
     });
   }
 
