@@ -61,10 +61,8 @@ class PaperOnboardingContainer extends Component {
 
   constructor(props) {
     super(props);
-    const routes = this.props.screens.map(item => React.createElement(item));
     this.nextBackground = 0;
     this.state = {
-      routes,
       currentScreen: 0,
       animationFinish: true,
       nextPoint: { x: 0, y: 0 },
@@ -116,7 +114,7 @@ class PaperOnboardingContainer extends Component {
   }
 
   getNextScreenIndex(direction) {
-    const { currentScreen, routes } = this.state;
+    const { currentScreen } = this.state;
     let directionModifier = 0;
     if (direction === 'left') {
       directionModifier = 1;
@@ -126,8 +124,8 @@ class PaperOnboardingContainer extends Component {
 
     let nextIndex = currentScreen + directionModifier;
     if (nextIndex < 0) {
-      nextIndex = routes.length - 1;
-    } else if (nextIndex >= routes.length) {
+      nextIndex = this.props.screens.length - 1;
+    } else if (nextIndex >= this.props.screens.length) {
       nextIndex = 0;
     }
     return nextIndex;
@@ -172,7 +170,7 @@ class PaperOnboardingContainer extends Component {
     );
   }
 
-  renderRippleBackground(screen, backgroundColor, isSwipeDirectionLeft = true) {
+  renderRippleBackground(backgroundColor, isSwipeDirectionLeft = true) {
     const { backgroundAnimation, nextPoint, animationFinish } = this.state;
     const radius = isSwipeDirectionLeft ? viewRadiusInterpolationR : viewRadiusInterpolation;
     const scale = isSwipeDirectionLeft ? viewScaleInterpolation : viewScaleInterpolationR;
@@ -271,7 +269,6 @@ class PaperOnboardingContainer extends Component {
 
   getScreensArray = () => {
     const {
-      routes,
       nextIndex,
       currentScreen,
     } = this.state;
@@ -280,7 +277,7 @@ class PaperOnboardingContainer extends Component {
         key={'current_screen_container'}
         style={[styles.screenAnimatedContainer, this.fadeOutStyle()]}
       >
-        {routes[currentScreen]}
+        {this.renderScreen(currentScreen)}
       </Animated.View>,
       nextIndex !== undefined
         ? (
@@ -288,18 +285,23 @@ class PaperOnboardingContainer extends Component {
             key={'next_screen_container'}
             style={[styles.nextScreenContainer, this.fadeInStyle()]}
           >
-            {routes[nextIndex]}
+            {this.renderScreen(nextIndex)}
           </Animated.View>
         )
         : null,
     ];
   }
 
+  renderScreen = (index) => {
+    if (typeof index === 'number') {
+      let screen = this.props.screens[index];
+      return React.createElement(screen, { currentIndex: this.state.currentScreen });
+    }
+  }
+
   render() {
     const {
-      routes,
       isSwipeDirectionLeft,
-      currentScreen,
       rootBackground,
     } = this.state;
     const screensArray = this.getScreensArray();
@@ -312,7 +314,7 @@ class PaperOnboardingContainer extends Component {
         ]}
         {...this.state.panResponder.panHandlers}
       >
-        {this.renderRippleBackground(routes[currentScreen], this.nextBackground, isSwipeDirectionLeft)}
+        {this.renderRippleBackground(this.nextBackground, isSwipeDirectionLeft)}
         {isSwipeDirectionLeft ? screensArray : screensArray.reverse()}
         <View style={styles.indicatorContainer}>
           {this.renderTabIndicators(isSwipeDirectionLeft)}
