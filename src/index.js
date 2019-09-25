@@ -5,12 +5,13 @@ import {
   Dimensions,
   Animated,
   View,
+  TouchableWithoutFeedback
 } from 'react-native';
 
 import styles from './styles';
 
 const { width, height } = Dimensions.get('screen');
-const RESPOND_THRESHHOLD = width / 3;
+const RESPOND_THRESHHOLD = width / 7;
 
 
 const viewRadiusInterpolation = {
@@ -57,6 +58,7 @@ class PaperOnboardingContainer extends Component {
   static propTypes = {
     screens: PropTypes.array,
     onIndexChanged: PropTypes.func,
+    advanceOnPressTabIndicator: PropTypes.bool,
   }
 
   constructor(props) {
@@ -70,10 +72,17 @@ class PaperOnboardingContainer extends Component {
       rootBackground: this.props.screens[0].backgroundColor,
       backgroundAnimation: new Animated.Value(0),
       panResponder: PanResponder.create({
-        onStartShouldSetPanResponder: () => true,
-        onStartShouldSetPanResponderCapture: () => true,
-        onMoveShouldSetResponderCapture: () => true,
-        onMoveShouldSetPanResponderCapture: () => true,
+        // onStartShouldSetPanResponder: () => true,
+        // onStartShouldSetPanResponderCapture: () => true,
+        onMoveShouldSetPanResponder: (e, gestureState) => {
+          const { dx, dy } = gestureState
+          return (dx > 2 || dx < -2 || dy > 2 || dy < -2)
+        },
+        onMoveShouldSetPanResponderCapture: (e, gestureState) => {
+          const { dx, dy } = gestureState
+          return (dx > 2 || dx < -2 || dy > 2 || dy < -2)
+        },
+        // onMoveShouldSetResponderCapture: () => true,
         onPanResponderRelease: (e, gestureState) => {
           const { x0, y0, dx, dy } = gestureState; // eslint-disable-line object-curly-newline
 
@@ -207,6 +216,12 @@ class PaperOnboardingContainer extends Component {
     };
   }
 
+  onPressTabIndicator = () => {
+    if (this.props.advanceOnPressTabIndicator) {
+      this.onSwipe('left', { x: width, y: height / 2 });
+    }
+  }
+
   renderTabIndicators(isSwipeDirectionLeft) {
     const { screens } = this.props;
     const { currentScreen, backgroundAnimation } = this.state;
@@ -248,6 +263,7 @@ class PaperOnboardingContainer extends Component {
           { transform: [{ translateX: backgroundAnimation.interpolate(translate) }] },
         ]}
       >
+
         <View style={styles.tabIndicatorRight}>
           {rightSide}
         </View>
@@ -316,9 +332,11 @@ class PaperOnboardingContainer extends Component {
       >
         {this.renderRippleBackground(this.nextBackground, isSwipeDirectionLeft)}
         {isSwipeDirectionLeft ? screensArray : screensArray.reverse()}
-        <View style={styles.indicatorContainer}>
-          {this.renderTabIndicators(isSwipeDirectionLeft)}
-        </View>
+        <TouchableWithoutFeedback onPress={this.onPressTabIndicator} >
+          <View style={styles.indicatorContainer}>
+            {this.renderTabIndicators(isSwipeDirectionLeft)}
+          </View>
+        </TouchableWithoutFeedback>
       </View>
     );
   }
