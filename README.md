@@ -53,6 +53,7 @@ export default class App extends Component {
     return (
       <PaperOnboarding
         screens={screens}
+        advanceOnPressTabIndicator
         onIndexChanged={(newIndex) => { /** do something */ }}
       />
     );
