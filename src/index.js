@@ -59,6 +59,8 @@ class PaperOnboardingContainer extends Component {
     screens: PropTypes.array,
     onIndexChanged: PropTypes.func,
     advanceOnPressTabIndicator: PropTypes.bool,
+    containerStyle: PropTypes.object,
+    indicatorContainerStyle: PropTypes.object,
   }
 
   constructor(props) {
@@ -327,13 +329,14 @@ class PaperOnboardingContainer extends Component {
         style={[
           styles.container,
           { backgroundColor: rootBackground },
+          this.props.containerStyle
         ]}
         {...this.state.panResponder.panHandlers}
       >
         {this.renderRippleBackground(this.nextBackground, isSwipeDirectionLeft)}
         {isSwipeDirectionLeft ? screensArray : screensArray.reverse()}
         <TouchableWithoutFeedback onPress={this.onPressTabIndicator} >
-          <View style={styles.indicatorContainer}>
+          <View style={[styles.indicatorContainer, this.props.indicatorContainerStyle]}>
             {this.renderTabIndicators(isSwipeDirectionLeft)}
           </View>
         </TouchableWithoutFeedback>
