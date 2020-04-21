@@ -11,8 +11,10 @@ import {
 import styles from './styles';
 
 const { width, height } = Dimensions.get('screen');
-const RESPOND_THRESHHOLD = width / 7;
-
+var RESPOND_THRESHHOLD = width / 7;
+if (width > 800) { // For large screens (i.e. ipad)
+  RESPOND_THRESHHOLD = width / 14;
+}
 
 const viewRadiusInterpolation = {
   inputRange: [0, 1],
